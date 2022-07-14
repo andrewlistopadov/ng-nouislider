@@ -4,7 +4,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {FormControlPipe} from './form-control.pipe';
+import {FormControlPipe} from './utils/form-control.pipe';
 import {NgNoUiSliderSliderModule} from './ng-nouislider/ng-nouislider.module';
 
 @NgModule({

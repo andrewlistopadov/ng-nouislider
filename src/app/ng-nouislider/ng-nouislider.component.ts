@@ -11,10 +11,10 @@ import {
   NgZone,
   OnDestroy,
   ChangeDetectionStrategy,
-  SimpleChanges,
 } from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
 import * as noUiSlider from 'nouislider';
+import {NgChanges} from '../utils/ng-onchanges';
 
 export interface NouiFormatter {
   to(value: number): string;
@@ -61,23 +61,20 @@ export class DefaultFormatter implements NouiFormatter {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit, OnChanges, OnDestroy {
-  public slider: any;
-  public handles!: any[];
-
-  @Input() public disabled!: boolean; // tslint:disable-line
-  @Input() public behaviour!: string;
+  @Input() public disabled?: boolean;
+  @Input() public behaviour?: string;
   @Input() public connect?: SingleHandleConnectType | boolean[];
-  @Input() public limit!: number;
+  @Input() public limit?: number;
   @Input() public min?: number;
   @Input() public max?: number;
   @Input() public snap?: boolean;
   @Input() public animate?: boolean | boolean[];
-  @Input() public range: any;
+  @Input() public range?: any;
   @Input() public step?: number;
   @Input() public format?: NouiFormatter;
   @Input() public pageSteps?: number;
   @Input() public config: any = {};
-  @Input() public ngModel!: number | number[];
+  @Input() public ngModel?: number | number[];
   @Input() public keyboard?: boolean;
   @Input() public onKeydown: any;
   @Input() public formControl?: FormControl;
@@ -90,6 +87,9 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
   @Output() public set: EventEmitter<any> = new EventEmitter(true);
   @Output() public start: EventEmitter<any> = new EventEmitter(true);
   @Output() public end: EventEmitter<any> = new EventEmitter(true);
+
+  public slider!: noUiSlider.API;
+  public handles!: any[];
 
   private value: any;
   private onChange: any = Function.prototype;
@@ -146,11 +146,11 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
       }
     }
 
-    this.slider.on('set', (values: string[], handle: number, unencoded: number[]) => {
+    this.slider.on('set', (values: (number | string)[], handle: number, unencoded: number[]) => {
       this.eventHandler(this.set, values, handle, unencoded);
     });
 
-    this.slider.on('update', (values: string[], handle: number, unencoded: number[]) => {
+    this.slider.on('update', (values: (number | string)[], handle: number, unencoded: number[]) => {
       if (this.update.observers.length > 0) {
         this.ngZone.run(() => {
           this.update.emit(this.toValues(values));
@@ -158,7 +158,7 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
       }
     });
 
-    this.slider.on('change', (values: string[], handle: number, unencoded: number[]) => {
+    this.slider.on('change', (values: (number | string)[], handle: number, unencoded: number[]) => {
       if (this.change.observers.length > 0) {
         this.ngZone.run(() => {
           this.change.emit(this.toValues(values));
@@ -166,11 +166,11 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
       }
     });
 
-    this.slider.on('slide', (values: string[], handle: number, unencoded: number[]) => {
+    this.slider.on('slide', (values: (number | string)[], handle: number, unencoded: number[]) => {
       this.eventHandler(this.slide, values, handle, unencoded);
     });
 
-    this.slider.on('start', (values: string[], handle: number, unencoded: number[]) => {
+    this.slider.on('start', (values: (number | string)[], handle: number, unencoded: number[]) => {
       if (this.start.observers.length > 0) {
         this.ngZone.run(() => {
           this.start.emit(this.toValues(values));
@@ -178,7 +178,7 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
       }
     });
 
-    this.slider.on('end', (values: string[], handle: number, unencoded: number[]) => {
+    this.slider.on('end', (values: (number | string)[], handle: number, unencoded: number[]) => {
       if (this.end.observers.length > 0) {
         this.ngZone.run(() => {
           this.end.emit(this.toValues(values));
@@ -187,21 +187,29 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
     });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (this.slider && (changes['min'] || changes['max'] || changes['step'] || changes['range'])) {
+  ngOnChanges(changes: NgChanges<NgNoUiSliderSliderComponent>): void {
+    if (!this.slider) return;
+
+    const sliderOptionsChanged = changes.min || changes.max || changes.step || changes.range;
+
+    if (sliderOptionsChanged) {
       this.ngZone.runOutsideAngular(() => {
         setTimeout(() => {
-          this.slider.updateOptions({
-            range: Object.assign(
-              {},
+          sliderOptionsChanged &&
+            this.slider.updateOptions(
               {
-                min: this.min,
-                max: this.max,
+                range: Object.assign(
+                  {},
+                  {
+                    min: this.min,
+                    max: this.max,
+                  },
+                  this.range || {},
+                ),
+                step: this.step,
               },
-              this.range || {},
-            ),
-            step: this.step,
-          });
+              false,
+            );
         });
       });
     }
@@ -215,7 +223,7 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
     }
   }
 
-  private toValues(values: string[]): any | any[] {
+  private toValues(values: (number | string)[]): any | any[] {
     let v = values.map(this.config.format.from);
     return v.length === 1 ? v[0] : v;
   }
@@ -242,7 +250,7 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
       : this.renderer.removeAttribute(this.el.nativeElement.childNodes[0], 'disabled');
   }
 
-  private eventHandler = (emitter: EventEmitter<any>, values: string[], handle: number, unencoded: number[]) => {
+  private eventHandler = (emitter: EventEmitter<any>, values: (number | string)[], handle: number, unencoded: number[]) => {
     let v = this.toValues(values);
     let emitEvents = false;
     if (this.value === undefined) {
