@@ -1,11 +1,12 @@
-.slider-hide-tooltip .noUi-tooltip {
+.ng-nouislider-tooltip-autohide .noUi-tooltip {
   visibility: hidden;
 }
-.slider-hide-tooltip .noUi-active .noUi-tooltip {
+
+.ng-nouislider-tooltip-autohide .noUi-active .noUi-tooltip {
   visibility: visible;
 }
 
-.slider-vertical-left-tooltip .noUi-vertical .noUi-handle .noUi-tooltip {
+.ng-nouislider-vertical-tooltip-right-positioned .noUi-vertical .noUi-handle .noUi-tooltip {
   right: unset;
   left: 120%;
 }
