@@ -1,0 +1,11 @@
+.slider-hide-tooltip .noUi-tooltip {
+  visibility: hidden;
+}
+.slider-hide-tooltip .noUi-active .noUi-tooltip {
+  visibility: visible;
+}
+
+.slider-vertical-left-tooltip .noUi-vertical .noUi-handle .noUi-tooltip {
+  right: unset;
+  left: 120%;
+}

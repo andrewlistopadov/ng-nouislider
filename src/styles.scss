@@ -1,3 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* #region nouislider  */
+/* #region KEEP_ORDER */
 @import '~nouislider/dist/nouislider.min.css';
 @import './assets/styles/nouislider-patch.scss';
+@import './assets/styles/ng-nouislider-global.scss';
+/* #endregion KEEP_ORDER */
+
+/* #endregion nouislider KEEP_ORDER */

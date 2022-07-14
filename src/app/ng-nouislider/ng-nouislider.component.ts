@@ -88,8 +88,8 @@ export class NgNoUiSliderSliderComponent implements ControlValueAccessor, OnInit
   @Output() public start: EventEmitter<any> = new EventEmitter(true);
   @Output() public end: EventEmitter<any> = new EventEmitter(true);
 
-  public slider!: noUiSlider.API;
-  public handles!: any[];
+  private slider!: noUiSlider.API;
+  private handles!: any[];
 
   private value: any;
   private onChange: any = Function.prototype;
