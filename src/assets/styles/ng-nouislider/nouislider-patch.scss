@@ -8,7 +8,7 @@
   width: 14px;
 }
 
-.noUi-handle:hover {
+.noUi-target:not([disabled]) .noUi-handle:hover {
   background: #eee;
 }
 
@@ -28,6 +28,13 @@
   width: 21px;
   box-shadow: none;
   border: 1px solid #999;
+}
+
+.noUi-horizontal[disabled] .noUi-handle,
+.noUi-vertical[disabled] .noUi-handle,
+[disabled].noUi-handle {
+  cursor: not-allowed;
+  background: #eee;
 }
 
 .noUi-vertical .noUi-handle {
